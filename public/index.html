@@ -3,37 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
+    <title>Sistema de Agendamento para Academia</title>
+    <style>
+        html, body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }        
+
+        header {
+            background-color: #3a3a8f;
+            color: white;
+            padding: 20px 10px;
+            text-align: center;
+        }
+        main {
+            flex: 1;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1, h2 {
+            color: #3a3a8f;
+        }
+        p {
+            line-height: 1.6;
+        }
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #3a3a8f;
+            color: white;
+        }
+    </style>
 </head>
 <body>
-    <div class="top-bar">
-        <span class="empresa">Nome da Empresa</span>
-        <nav class="nav-links">
-            <a href="#">Link1</a>
-            <a href="#">Link2</a>
-            <a href="#">Link3</a>
-            <a href="#">Link4</a>
-        </nav>
-    </div>
-    <div class="content">
-        <h1 class="titulo">Título</h1>
-        <p class="texto">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras quis sodales magna, sed malesuada eros. 
-            Donec odio sapien, suscipit auctor mollis a, auctor vitae lectus.
-        </p>
-        <p class="texto">
-            Morbi est enim, lacinia sit amet libero vel, egestas vestibulum felis. Etiam ut feugiat nulla, sit amet pellentesque quam. 
-            Integer enim lacus, volutpat eget maximus sed, convallis quis mi. Suspendisse pulvinar id nulla a condimentum. 
-            Nam nec ultrices mi. Donec et elit risus.
-        </p>
-        <h2 class="subtitulo">Subtítulo</h2>
-        <p class="texto">
-            Cras sit amet scelerisque justo, at porttitor lectus. Quisque tristique, tellus non laoreet ultricies, 
-            felis arcu efficitur tortor, id sollicitudin lacus justo elementum massa. Aliquam erat volutpat.
-        </p>
-    </div>
-    <div class="footer-bar">
-        <span class="direitos">Todos os direitos reservados - 2018</span>
-    </div>
+    <header>
+        <h1>Sistema de Agendamento para Academia</h1>
+    </header>
+    <main>
+        <h2>Sobre o Projeto</h2>
+        <p>Este é um sistema web desenvolvido para facilitar o agendamento de horários de uso de máquinas e equipamentos em academias. Ele tem como objetivo organizar e otimizar a utilização dos equipamentos, oferecendo uma experiência prática e eficiente para os usuários.</p>
+        
+        <h2>Funcionalidades</h2>
+        <ul>
+            <li>Cadastro de usuários com informações básicas.</li>
+            <li>Consulta e agendamento de horários para uso de equipamentos.</li>
+        </ul>
+
+        <h2>Tecnologias Utilizadas</h2>
+        <p>Este projeto foi construído utilizando as seguintes tecnologias:</p>
+        <ul>
+            <li>Node.js e Express para o backend.</li>
+            <li>HTML, CSS e JavaScript para o frontend.</li>
+            <li>Banco de dados relacional para armazenamento de informações (PostgreeSQL).</li>
+        </ul>
+
+    </main>
+    <footer>
+        <p>&copy; 2024 Sistema de Agendamento para Academia. Todos os direitos reservados.</p>
+    </footer>
 </body>
 </html>
