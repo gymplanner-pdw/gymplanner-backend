@@ -2,15 +2,28 @@
   "name": "projeto",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node src/app.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.21.2"
-  }
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "pg": "^8.13.3",
+    "sequelize": "^6.37.5",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gymplanner-pdw/gymplanner-backend.git"
+  },
+  "bugs": {
+    "url": "https://github.com/gymplanner-pdw/gymplanner-backend/issues"
+  },
+  "homepage": "https://github.com/gymplanner-pdw/gymplanner-backend#readme"
 }
