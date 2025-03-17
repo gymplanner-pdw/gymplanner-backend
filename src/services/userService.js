@@ -1,58 +1,88 @@
-const pool = require('../database');
-
-exports.createUser = async (nome, senha) => {
-  try {
-    const result = await pool.query(
-      'INSERT INTO usuarios (nome, senha) VALUES ($1, $2) RETURNING *',
-      [nome, senha]
-    );
-    return result.rows[0]; // Retorna o usuário inserido
-  } catch (error) {
-    console.error('Erro ao criar usuário:', error);
-    throw new Error('Erro ao criar usuário');
-  }
-};
-
+const userModel = require('../models/userModel');
+const bcrypt = require('bcrypt');
 
 exports.getUsers = async () => {
   try {
-    const result = await pool.query('SELECT * FROM usuarios');
-    return result.rows; // Retorna todos os usuários
+    return await userModel.getAllUsers();
   } catch (error) {
-    console.error('Erro ao buscar usuários:', error);
-    throw new Error('Erro ao buscar usuários');
+    throw new Error('Erro ao buscar usuários.');
   }
 };
 
 exports.getUserById = async (id) => {
   try {
-    const result = await pool.query('SELECT * FROM usuarios WHERE id = $1', [id]);
-    return result.rows[0]; // Retorna um usuário pelo id
+    const user = await userModel.getUserById(id);
+    if (!user) {
+      throw new Error('Usuário não encontrado.');
+    }
+    return user;
   } catch (error) {
-    console.error('Erro ao buscar usuário:', error);
-    throw new Error('Erro ao buscar usuário');
+    throw new Error('Erro ao buscar usuário.');
+  }
+};
+
+
+exports.createUser = async (nome, senha, tipo_usuario = 'usuario') => {
+  try {
+    const existingUser = await userModel.getUserByName(nome);
+    if (existingUser) {
+      throw new Error('Nome de usuário já está em uso.');
+    }
+
+
+    const hashedPassword = await bcrypt.hash(senha, 10);
+
+    return await userModel.createUser(nome, hashedPassword, tipo_usuario);
+  } catch (error) {
+    throw new Error(error.message || 'Erro ao criar usuário.');
+  }
+};
+
+exports.authenticateUser = async (nome, senha) => {
+  try {
+    const user = await userModel.getUserByName(nome);
+    if (!user) {
+      throw new Error('Credenciais inválidas.');
+    }
+
+    const senhaCorreta = await bcrypt.compare(senha, user.senha);
+    if (!senhaCorreta) {
+      throw new Error('Credenciais inválidas.');
+    }
+
+    return user;
+  } catch (error) {
+    throw new Error(error.message || 'Erro na autenticação do usuário.');
   }
 };
 
 exports.updateUser = async (id, nome, senha) => {
   try {
-    const result = await pool.query(
-      'UPDATE usuarios SET nome = $1, senha = $2 WHERE id = $3 RETURNING *',
-      [nome, senha, id]
-    );
-    return result.rows[0]; // Retorna o usuário atualizado
+    const user = await userModel.getUserById(id);
+    if (!user) {
+      throw new Error('Usuário não encontrado.');
+    }
+
+    let hashedPassword = null;
+    if (senha) {
+      hashedPassword = await bcrypt.hash(senha, 10);
+    }
+
+    return await userModel.updateUser(id, nome, hashedPassword);
   } catch (error) {
-    console.error('Erro ao atualizar usuário:', error);
-    throw new Error('Erro ao atualizar usuário');
+    throw new Error(error.message || 'Erro ao atualizar usuário.');
   }
 };
 
-exports.deleteUser = async (id) => {
+exports.deleteUser = async (id, tipo_usuario_solicitante) => {
   try {
-    const result = await pool.query('DELETE FROM usuarios WHERE id = $1 RETURNING *', [id]);
-    return result.rows[0]; // Retorna o usuário deletado
+    const user = await userModel.getUserById(id);
+    if (!user) {
+      throw new Error('Usuário não encontrado.');
+    }
+
+    return await userModel.deleteUser(id, tipo_usuario_solicitante);
   } catch (error) {
-    console.error('Erro ao deletar usuário:', error);
-    throw new Error('Erro ao deletar usuário');
+    throw new Error(error.message || 'Erro ao excluir usuário.');
   }
 };

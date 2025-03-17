@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const machineController = require('../controllers/machineController');
+const { authenticateToken, authorizeAdmin } = require('../middleware/authMiddleware');
 
 /**
  * @swagger
  * tags:
  *   name: Machines
- *   description: API para gerenciamento de máquinas
+ *   description: Gerenciamento de máquinas
  */
 
 /**
@@ -15,29 +16,14 @@ const machineController = require('../controllers/machineController');
  *   get:
  *     summary: Retorna uma lista de todas as máquinas
  *     tags: [Machines]
+ *     security:
+ *       - bearerAuth: []
+ *     description: Permite que qualquer usuário autenticado visualize a lista de máquinas disponíveis.
  *     responses:
  *       200:
- *         description: Lista de máquinas
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: integer
- *                   nome:
- *                     type: string
- *                   grupo_muscular:
- *                     type: string
- *                   status:
- *                     type: string
- *                   ultima_manutencao:
- *                     type: string
- *                     format: date
+ *         description: Lista de máquinas retornada com sucesso
  */
-router.get('/', machineController.getMachines);
+router.get('/', authenticateToken, machineController.getMachines);
 
 /**
  * @swagger
@@ -45,6 +31,9 @@ router.get('/', machineController.getMachines);
  *   get:
  *     summary: Retorna uma máquina específica
  *     tags: [Machines]
+ *     security:
+ *       - bearerAuth: []
+ *     description: Permite que qualquer usuário autenticado visualize os detalhes de uma máquina específica.
  *     parameters:
  *       - in: path
  *         name: id
@@ -55,26 +44,10 @@ router.get('/', machineController.getMachines);
  *     responses:
  *       200:
  *         description: Máquina encontrada
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: integer
- *                 nome:
- *                   type: string
- *                 grupo_muscular:
- *                   type: string
- *                 status:
- *                   type: string
- *                 ultima_manutencao:
- *                   type: string
- *                   format: date
  *       404:
  *         description: Máquina não encontrada
  */
-router.get('/:id', machineController.getMachineById);
+router.get('/:id', authenticateToken, machineController.getMachineById);
 
 /**
  * @swagger
@@ -82,6 +55,9 @@ router.get('/:id', machineController.getMachineById);
  *   post:
  *     summary: Cria uma nova máquina
  *     tags: [Machines]
+ *     security:
+ *       - bearerAuth: []
+ *     description: Apenas administradores podem criar novas máquinas no sistema.
  *     requestBody:
  *       required: true
  *       content:
@@ -95,14 +71,17 @@ router.get('/:id', machineController.getMachineById);
  *                 type: string
  *               status:
  *                 type: string
+ *                 enum: ["disponivel", "indisponivel", "em manutencao"]
  *               ultima_manutencao:
  *                 type: string
  *                 format: date
  *     responses:
  *       201:
- *         description: Máquina criada
+ *         description: Máquina criada com sucesso
+ *       403:
+ *         description: Acesso negado. Apenas administradores podem criar máquinas.
  */
-router.post('/', machineController.createMachine);
+router.post('/', authenticateToken, authorizeAdmin, machineController.createMachine);
 
 /**
  * @swagger
@@ -110,6 +89,9 @@ router.post('/', machineController.createMachine);
  *   put:
  *     summary: Atualiza uma máquina existente
  *     tags: [Machines]
+ *     security:
+ *       - bearerAuth: []
+ *     description: Apenas administradores podem modificar os dados de uma máquina existente.
  *     parameters:
  *       - in: path
  *         name: id
@@ -130,16 +112,19 @@ router.post('/', machineController.createMachine);
  *                 type: string
  *               status:
  *                 type: string
+ *                 enum: ["disponivel", "indisponivel", "em manutencao"]
  *               ultima_manutencao:
  *                 type: string
  *                 format: date
  *     responses:
  *       200:
- *         description: Máquina atualizada
+ *         description: Máquina atualizada com sucesso
+ *       403:
+ *         description: Acesso negado. Apenas administradores podem modificar máquinas.
  *       404:
  *         description: Máquina não encontrada
  */
-router.put('/:id', machineController.updateMachine);
+router.put('/:id', authenticateToken, authorizeAdmin, machineController.updateMachine);
 
 /**
  * @swagger
@@ -147,6 +132,9 @@ router.put('/:id', machineController.updateMachine);
  *   delete:
  *     summary: Deleta uma máquina
  *     tags: [Machines]
+ *     security:
+ *       - bearerAuth: []
+ *     description: Apenas administradores podem remover uma máquina do sistema. Máquinas com agendamentos futuros não podem ser excluídas.
  *     parameters:
  *       - in: path
  *         name: id
@@ -156,10 +144,14 @@ router.put('/:id', machineController.updateMachine);
  *           type: integer
  *     responses:
  *       200:
- *         description: Máquina deletada
+ *         description: Máquina deletada com sucesso
+ *       403:
+ *         description: Acesso negado. Apenas administradores podem deletar máquinas.
  *       404:
  *         description: Máquina não encontrada
+ *       409:
+ *         description: Não é possível excluir uma máquina com agendamentos futuros.
  */
-router.delete('/:id', machineController.deleteMachine);
+router.delete('/:id', authenticateToken, authorizeAdmin, machineController.deleteMachine);
 
 module.exports = router;
