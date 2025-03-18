@@ -5,7 +5,8 @@
   "main": "src/app.js",
   "scripts": {
     "test": "mocha \"test/**/*.spec.js\"",
-    "start": "node src/app.js"
+    "start": "node src/app.js",
+    "coverage": "nyc npm test"
   },
   "keywords": [],
   "author": "",
@@ -32,6 +33,12 @@
   },
   "homepage": "https://github.com/gymplanner-pdw/gymplanner-backend#readme",
   "devDependencies": {
-    "mocha": "^11.1.0"
+    "mocha": "^11.1.0",
+    "nyc": "^17.1.0"
+  },
+  "nyc": {
+    "reporter": ["text", "html"],
+    "include": ["src/**/*.js"],
+    "exclude": ["test/**", "node_modules/**"]
   }
 }

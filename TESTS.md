@@ -11,98 +11,108 @@ Este documento descreve a implementação dos testes para a API do GymPlanner, u
    Certifique-se de que as dependências de testes estejam instaladas no projeto. Caso não estejam, execute o seguinte comando:
 
    ```sh
-   npm install --save-dev mocha chai chai-http
+   npm install --save-dev mocha chai chai-http nyc
    ```
 
 2. **Estrutura de Diretórios**  
-   Os arquivos de teste estão organizados dentro do diretório `test/` seguindo a estrutura abaixo:
+   A estrutura dos testes está organizada da seguinte forma:
 
    ```
-   test/
-   │── agendamento.spec.js
-   │── exercicio.spec.js
-   │── machine.spec.js
-   │── treino.spec.js
-   └── user.spec.js
+   projeto/
+   ├── src/
+   ├── test/
+   │   ├── agendamento.spec.js
+   │   ├── exercicio.spec.js
+   │   ├── machine.spec.js
+   │   ├── treino.spec.js
+   │   ├── user.spec.js
+   ├── package.json
+   ├── ...
    ```
-
-   Cada arquivo de teste é responsável por validar os endpoints relacionados à sua respectiva entidade.
 
 ---
 
-## Execução dos Testes
+## Testes Implementados
 
-Para rodar os testes, utilize o seguinte comando:
+Abaixo está a lista de testes implementados, categorizados por entidade:
+
+| Categoria       | Método | Endpoint                        | Descrição |
+|---------------|--------|--------------------------------|-----------|
+| Agendamento  | GET    | /agendamentos                 | Retorna a lista de agendamentos |
+| Agendamento  | POST   | /agendamentos                 | Cria um novo agendamento |
+| Exercício    | GET    | /exercicios                   | Retorna a lista de exercícios |
+| Exercício    | POST   | /exercicios                   | Cria um novo exercício |
+| Máquina      | GET    | /machines/nome/:nome          | Busca uma máquina pelo nome |
+| Máquina      | GET    | /machines/nome/:nome          | Retorna erro para máquina inexistente |
+| Treino       | GET    | /treinos                      | Retorna a lista de treinos |
+| Treino       | POST   | /treinos                      | Cria um novo treino |
+| Usuário      | POST   | /users                        | Cria um usuário válido |
+| Usuário      | GET    | /users/nome/:nome             | Busca um usuário pelo nome |
+| Usuário      | GET    | /users/nome/:nome             | Retorna erro para usuário inexistente |
+
+---
+
+## Relatório de Cobertura de Testes
+
+Abaixo está o relatório de cobertura de testes gerado pelo `nyc`:
+
+```
+---------------------------|---------|----------|---------|---------|-----------------------------------------------------
+File                       | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+---------------------------|---------|----------|---------|---------|-----------------------------------------------------
+All files                  |   26.78 |     7.49 |      10 |   27.12 |
+ src                       |   96.29 |    58.33 |      50 |   96.29 |
+  app.js                   |   95.65 |      100 |      50 |   95.65 | 24
+  database.js              |     100 |       50 |     100 |     100 | 5-9
+ src/config                |     100 |      100 |     100 |     100 |
+  swaggerConfig.js         |     100 |      100 |     100 |     100 |
+ src/controllers           |   15.11 |     8.69 |    3.33 |   15.21 |
+  agendamentoController.js |   10.71 |        0 |       0 |   10.71 | 4-12,18-33,39-60,66-82,88-103
+  exercicioController.js   |   12.72 |        0 |       0 |   12.72 | 6-10,16-26,32-56,62-81,87-105
+  machineController.js     |   11.32 |        0 |       0 |   11.32 | 4-8,13-23,28-53,58-75,80-96
+  treinoController.js      |   12.67 |        0 |       0 |   12.85 | 6-11,17-25,31-36,42-53,59-71,77-88,94-127
+  userController.js        |      25 |    24.61 |   14.28 |   25.33 | 13,17,21,25,30,34,42-63,69-77,82-97,102-123,128-148
+---------------------------|---------|----------|---------|---------|-----------------------------------------------------
+```
+
+---
+
+## Problemas Atuais
+
+1. **Autenticação Bloqueando Testes**  
+   - Muitos testes falham devido a autenticação exigida para acessar os endpoints. Precisamos criar um mock de autenticação para os testes.
+
+2. **Dados Inexistentes no Banco de Dados**  
+   - Alguns testes falham porque os dados requisitados não existem. Precisamos garantir que os dados de teste sejam inseridos antes da execução dos testes.
+
+3. **Cobertura Baixa em Alguns Módulos**  
+   - Os controllers e services têm baixa cobertura. Precisamos adicionar mais testes unitários para aumentar essa cobertura.
+
+---
+
+## Próximos Passos
+
+1. **Implementar Mock de Autenticação**  
+   - Criar um middleware de mock para permitir testes sem autenticação real.
+
+2. **Criar Seeders para Testes**  
+   - Criar um script que popula o banco de testes com dados iniciais antes da execução dos testes.
+
+3. **Aumentar Cobertura**  
+   - Adicionar mais testes unitários nos controllers e services para atingir pelo menos 80% de cobertura.
+
+---
+
+## Executando os Testes
+
+Para rodar os testes, utilize:
 
 ```sh
 npm test
 ```
 
-Isso executará todos os testes dentro do diretório `test/`. Caso deseje rodar um teste específico, utilize:
+Para rodar os testes com relatório de cobertura:
 
 ```sh
-npx mocha test/user.spec.js
+npm run coverage
 ```
-
----
-
-## Descrição dos Testes Implementados
-
-### **1. Testes de Usuário (`user.spec.js`)**
-**Objetivo:** Testar a criação e recuperação de usuários na API.
-
-**Casos de Teste Implementados:**
-- `POST /users` - Criar um usuário válido (esperado: `201 Created`).
-- `POST /users` - Criar um usuário sem nome (esperado: `400 Bad Request`).
-- `GET /users/nome/:nome` - Buscar um usuário existente (esperado: `200 OK`).
-- `GET /users/nome/:nome` - Buscar um usuário inexistente (esperado: `404 Not Found`).
-
-### **2. Testes de Máquinas (`machine.spec.js`)**
-**Objetivo:** Validar a recuperação de máquinas cadastradas.
-
-**Casos de Teste Implementados:**
-- `GET /machines/nome/:nome` - Buscar uma máquina pelo nome (esperado: `200 OK`).
-- `GET /machines/nome/:nome` - Buscar uma máquina inexistente (esperado: `404 Not Found`).
-
-### **3. Testes de Treinos (`treino.spec.js`)**
-**Objetivo:** Verificar o correto funcionamento da criação e recuperação de treinos.
-
-**Casos de Teste Implementados:**
-- `GET /treinos` - Recuperar lista de treinos (esperado: `200 OK`).
-- `POST /treinos` - Criar um novo treino (esperado: `201 Created`).
-
-### **4. Testes de Exercícios (`exercicio.spec.js`)**
-**Objetivo:** Validar a manipulação de exercícios dentro de treinos.
-
-**Casos de Teste Implementados:**
-- `GET /exercicios` - Recuperar lista de exercícios (esperado: `200 OK`).
-- `POST /exercicios` - Criar um novo exercício (esperado: `201 Created`).
-
-### **5. Testes de Agendamentos (`agendamento.spec.js`)**
-**Objetivo:** Testar a criação e recuperação de agendamentos.
-
-**Casos de Teste Implementados:**
-- `GET /agendamentos` - Recuperar lista de agendamentos (esperado: `200 OK`).
-- `POST /agendamentos` - Criar um novo agendamento (esperado: `201 Created`).
-
----
-
-## Problemas Conhecidos e Próximos Passos
-
-### **1. Problemas com Autenticação**
-Os testes falham devido a problemas com autenticação (`403 Forbidden`). Para corrigir:
-- **Verificar a geração de tokens JWT**: As requisições devem ser autenticadas corretamente antes de acessar rotas protegidas.
-- **Criar usuários de teste**: Usuários administradores e padrões precisam ser criados antes da execução dos testes.
-- **Revisar middleware de autenticação**: Alguns testes podem necessitar de ajustes nas permissões de acesso.
-
-### **2. Ajustes nos Dados de Teste**
-Os testes podem falhar devido à ausência de dados esperados no banco de dados. Para corrigir:
-- **Criar scripts de seed** para popular o banco antes dos testes.
-- **Garantir rollback após os testes** para evitar inconsistências.
-
-### **3. Melhorias Futuras**
-- Implementação de testes adicionais para os endpoints `PUT` e `DELETE`.
-- Automação dos testes no CI/CD utilizando GitHub Actions.
-- Melhor cobertura de testes para validações de entrada.
-
-Após a correção dos problemas acima, os testes devem passar sem erros e garantir a estabilidade da API.
