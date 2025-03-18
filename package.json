@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha \"test/**/*.spec.js\"",
     "start": "node src/app.js"
   },
   "keywords": [],
@@ -12,6 +12,8 @@
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.1",
+    "chai": "^4.3.7",
+    "chai-http": "^4.3.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "joi": "^17.13.3",
@@ -28,5 +30,8 @@
   "bugs": {
     "url": "https://github.com/gymplanner-pdw/gymplanner-backend/issues"
   },
-  "homepage": "https://github.com/gymplanner-pdw/gymplanner-backend#readme"
+  "homepage": "https://github.com/gymplanner-pdw/gymplanner-backend#readme",
+  "devDependencies": {
+    "mocha": "^11.1.0"
+  }
 }

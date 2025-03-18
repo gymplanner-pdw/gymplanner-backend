@@ -25,7 +25,8 @@ app.get('/', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);
   console.log(`Documentação disponível em http://localhost:${PORT}/api-docs`);
 });
+module.exports = server;
