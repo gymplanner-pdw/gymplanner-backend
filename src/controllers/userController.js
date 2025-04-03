@@ -25,13 +25,19 @@ exports.createUser = async (req, res) => {
       return res.status(400).json({ error: "O tipo de usuário deve ser 'usuario' ou 'admin'." });
     }
 
-
     if (tipo_usuario === 'admin' && (!req.user || req.user.tipo_usuario !== 'admin')) {
       return res.status(403).json({ error: 'Apenas administradores podem criar outros administradores.' });
     }
 
     const newUser = await userService.createUser(nome, senha, tipo_usuario || 'usuario');
-    res.status(201).json({ message: 'Usuário criado com sucesso.', usuario: newUser });
+
+    const token = jwt.sign(
+      { id: newUser.id, nome: newUser.nome, tipo_usuario: newUser.tipo_usuario },
+      SECRET_KEY,
+      { expiresIn: TOKEN_EXPIRATION }
+    );
+
+    res.status(201).json({ message: 'Usuário criado com sucesso.', usuario: newUser, token });
   } catch (error) {
     res.status(500).json({ error: error.message || 'Erro ao criar usuário.' });
   }

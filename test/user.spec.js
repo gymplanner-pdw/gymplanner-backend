@@ -25,7 +25,7 @@ describe("User API", () => {
         it("Deve criar um usuário válido", (done) => {
             chai.request(server)
                 .post("/users/register")
-                .send({ nome: "binha", senha: "456" })
+                .send({ nome: "binha", senha: "123456" })
                 .end((err, res) => {
                     expect(res).to.have.status(201);
                     expect(res.body).to.have.property("id");
