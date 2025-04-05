@@ -4,8 +4,7 @@ const jwt = require('jsonwebtoken');
 const SECRET_KEY = process.env.JWT_SECRET || 'secret_key';
 const TOKEN_EXPIRATION = process.env.JWT_EXPIRATION || '1h';
 
-
-exports.createUser = async (req, res) => {
+const createUser = async (req, res) => {
   try {
     const { nome, senha, tipo_usuario } = req.body;
 
@@ -25,8 +24,14 @@ exports.createUser = async (req, res) => {
       return res.status(400).json({ error: "O tipo de usuário deve ser 'usuario' ou 'admin'." });
     }
 
-    if (tipo_usuario === 'admin' && (!req.user || req.user.tipo_usuario !== 'admin')) {
-      return res.status(403).json({ error: 'Apenas administradores podem criar outros administradores.' });
+    if (tipo_usuario === 'admin') {
+      const existingUsers = await userService.getUsers();
+      const existingAdmins = existingUsers.filter(u => u.tipo_usuario === 'admin');
+      const isFirstAdmin = existingAdmins.length === 0;
+
+      if (!isFirstAdmin && (!req.user || req.user.tipo_usuario !== 'admin')) {
+        return res.status(403).json({ error: 'Apenas administradores podem criar outros administradores.' });
+      }
     }
 
     const newUser = await userService.createUser(nome, senha, tipo_usuario || 'usuario');
@@ -39,12 +44,12 @@ exports.createUser = async (req, res) => {
 
     res.status(201).json({ message: 'Usuário criado com sucesso.', usuario: newUser, token });
   } catch (error) {
+    console.error('Erro em createUser:', error); // <-- LOG ADICIONADO
     res.status(500).json({ error: error.message || 'Erro ao criar usuário.' });
   }
 };
 
-
-exports.authenticateUser = async (req, res) => {
+const authenticateUser = async (req, res) => {
   try {
     const { nome, senha } = req.body;
 
@@ -56,7 +61,6 @@ exports.authenticateUser = async (req, res) => {
     if (!user) {
       return res.status(401).json({ error: 'Credenciais inválidas.' });
     }
-
 
     const token = jwt.sign(
       { id: user.id, nome: user.nome, tipo_usuario: user.tipo_usuario },
@@ -70,21 +74,20 @@ exports.authenticateUser = async (req, res) => {
   }
 };
 
-
-exports.getUsers = async (req, res) => {
+const getUsers = async (req, res) => {
   try {
-    if (req.user.tipo_usuario !== 'admin') {
+    if (req && req.user && req.user.tipo_usuario !== 'admin') {
       return res.status(403).json({ error: 'Apenas administradores podem acessar esta informação.' });
     }
 
     const users = await userService.getUsers();
-    res.status(200).json(users);
+    return res.status(200).json(users);
   } catch (error) {
-    res.status(500).json({ error: 'Erro ao buscar usuários.' });
+    return res.status(500).json({ error: 'Erro ao buscar usuários.' });
   }
 };
 
-exports.getUserById = async (req, res) => {
+const getUserById = async (req, res) => {
   try {
     const { id } = req.params;
     const user = await userService.getUserById(id);
@@ -92,7 +95,6 @@ exports.getUserById = async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: 'Usuário não encontrado.' });
     }
-
 
     if (req.user.id !== parseInt(id) && req.user.tipo_usuario !== 'admin') {
       return res.status(403).json({ error: 'Acesso negado.' });
@@ -104,7 +106,7 @@ exports.getUserById = async (req, res) => {
   }
 };
 
-exports.updateUser = async (req, res) => {
+const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
     const { nome, senha } = req.body;
@@ -112,7 +114,6 @@ exports.updateUser = async (req, res) => {
     if (req.user.id !== parseInt(id) && req.user.tipo_usuario !== 'admin') {
       return res.status(403).json({ error: 'Acesso negado.' });
     }
-
 
     const currentUser = await userService.getUserById(id);
     if (!currentUser) {
@@ -130,14 +131,13 @@ exports.updateUser = async (req, res) => {
   }
 };
 
-exports.deleteUser = async (req, res) => {
+const deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
 
     if (req.user.id !== parseInt(id) && req.user.tipo_usuario !== 'admin') {
       return res.status(403).json({ error: 'Acesso negado.' });
     }
-
 
     if (req.user.tipo_usuario === 'admin') {
       const users = await userService.getUsers();
@@ -153,4 +153,13 @@ exports.deleteUser = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message || 'Erro ao remover usuário.' });
   }
+};
+
+module.exports = {
+  createUser,
+  authenticateUser,
+  getUsers,
+  getUserById,
+  updateUser,
+  deleteUser
 };

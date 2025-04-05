@@ -1,13 +1,9 @@
 require('dotenv').config();
-console.log('Credenciais carregadas:', process.env.DB_USER, process.env.DB_PASS, process.env.DB_NAME);
+const app = require('./app');
 
-const pool = require('./database');
+const PORT = process.env.PORT || 3000;
 
-pool.query('SELECT NOW()', (err, res) => {
-    if (err) {
-        console.error('Erro na conexão:', err);
-    } else {
-        console.log('Conexão bem-sucedida:', res.rows);
-    }
-    pool.end();
+app.listen(PORT, () => {
+  console.log(`Servidor rodando em http://localhost:${PORT}`);
+  console.log(`Documentação disponível em http://localhost:${PORT}/api-docs`);
 });

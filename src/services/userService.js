@@ -5,6 +5,7 @@ exports.getUsers = async () => {
   try {
     return await userModel.getAllUsers();
   } catch (error) {
+    console.error('Erro no userService.getUsers:', error);
     throw new Error('Erro ao buscar usuários.');
   }
 };

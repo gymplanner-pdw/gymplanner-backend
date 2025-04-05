@@ -24,9 +24,4 @@ app.get('/', (req, res) => {
   res.send('API funcionando!');
 });
 
-const PORT = process.env.PORT || 3000;
-const server = app.listen(PORT, () => {
-  console.log(`Servidor rodando em http://localhost:${PORT}`);
-  console.log(`Documentação disponível em http://localhost:${PORT}/api-docs`);
-});
-module.exports = server;
+module.exports = app;
