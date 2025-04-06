@@ -33,9 +33,9 @@ describe("Agendamento API", () => {
         .post("/agendamentos")
         .set("Authorization", `Bearer ${userToken}`)
         .send({
-          id_maquina: 1,
-          data_inicio: "2025-04-01T10:00:00Z",
-          data_fim: "2025-04-01T10:10:00Z"
+          id_maquina: 2,
+          data_inicio: "2025-04-02T09:00:00Z",
+          data_fim: "2025-04-02T09:10:00Z"
         })
         .end((err, res) => {
           expect(res).to.have.status(201);

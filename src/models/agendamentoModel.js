@@ -111,3 +111,21 @@ exports.deleteAgendamento = async (id) => {
   const { rows } = await pool.query('DELETE FROM agendamentos WHERE id = $1 RETURNING *', [id]);
   return rows[0];
 };
+
+exports.getAgendamentosByUserAndMachine = async (id_usuario, id_maquina, data_inicio) => {
+  const result = await pool.query(
+    `SELECT * FROM agendamentos 
+     WHERE id_usuario = $1 AND id_maquina = $2 AND data_inicio = $3`,
+    [id_usuario, id_maquina, data_inicio]
+  );
+  return result.rows;
+};
+
+exports.countAgendamentos = async (id_maquina, data_inicio) => {
+  const result = await pool.query(
+    `SELECT COUNT(*) FROM agendamentos 
+     WHERE id_maquina = $1 AND data_inicio = $2`,
+    [id_maquina, data_inicio]
+  );
+  return parseInt(result.rows[0].count, 10);
+};
