@@ -102,3 +102,13 @@ exports.cancelAgendamento = async (id_agendamento, id_usuario) => {
     throw new Error(error.message || 'Erro ao cancelar agendamento.');
   }
 };
+
+const db = require('../database');
+
+exports.getAgendamentosByUsuario = async (idUsuario) => {
+  const result = await db.query(
+    'SELECT * FROM agendamentos WHERE id_usuario = $1 ORDER BY data_inicio',
+    [idUsuario]
+  );
+  return result.rows;
+};

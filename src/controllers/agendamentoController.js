@@ -2,11 +2,14 @@ const agendamentoService = require('../services/agendamentoService');
 
 exports.getAgendamentos = async (req, res) => {
   try {
-    if (req.user.tipo_usuario !== 'admin') {
-      return res.status(403).json({ error: 'Acesso negado.' });
+    let agendamentos;
+
+    if (req.user.tipo_usuario === 'admin') {
+      agendamentos = await agendamentoService.getAgendamentos();
+    } else {
+      agendamentos = await agendamentoService.getAgendamentosByUsuario(req.user.id);
     }
 
-    const agendamentos = await agendamentoService.getAgendamentos();
     res.json(agendamentos);
   } catch (error) {
     res.status(500).json({ error: 'Erro ao buscar agendamentos.' });
