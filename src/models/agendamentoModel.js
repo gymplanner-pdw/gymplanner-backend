@@ -1,23 +1,19 @@
 const pool = require('../database');
 
-
 exports.getAgendamentos = async () => {
   const result = await pool.query('SELECT * FROM agendamentos');
   return result.rows;
 };
-
 
 exports.getAgendamentoById = async (id) => {
   const result = await pool.query('SELECT * FROM agendamentos WHERE id = $1', [id]);
   return result.rows[0];
 };
 
-
 exports.getAgendamentosByUserId = async (id_usuario) => {
   const result = await pool.query('SELECT * FROM agendamentos WHERE id_usuario = $1', [id_usuario]);
   return result.rows;
 };
-
 
 exports.getAgendamentosByMachineId = async (id_maquina) => {
   const result = await pool.query('SELECT * FROM agendamentos WHERE id_maquina = $1', [id_maquina]);
@@ -66,7 +62,6 @@ exports.createAgendamento = async (id_usuario, id_maquina, data_inicio, data_fim
   return rows[0];
 };
 
-
 exports.updateAgendamento = async (id, data_inicio, data_fim) => {
   const agendamento = await this.getAgendamentoById(id);
   if (!agendamento) {
@@ -100,7 +95,6 @@ exports.updateAgendamento = async (id, data_inicio, data_fim) => {
   );
   return rows[0];
 };
-
 
 exports.deleteAgendamento = async (id) => {
   const agendamento = await this.getAgendamentoById(id);

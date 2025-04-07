@@ -2,7 +2,6 @@ const agendamentoModel = require('../models/agendamentoModel');
 const userModel = require('../models/userModel');
 const machineModel = require('../models/machineModel');
 
-
 exports.getAgendamentos = async () => {
   try {
     return await agendamentoModel.getAgendamentos();
@@ -10,7 +9,6 @@ exports.getAgendamentos = async () => {
     throw new Error('Erro ao buscar agendamentos.');
   }
 };
-
 
 exports.getAgendamentoById = async (id) => {
   try {
@@ -26,7 +24,6 @@ exports.getAgendamentoById = async (id) => {
 
 exports.createAgendamento = async (id_usuario, id_maquina, data_inicio, data_fim) => {
   try {
-
     const [usuario, maquina] = await Promise.all([
       userModel.getUserById(id_usuario),
       machineModel.getMachineById(id_maquina),
@@ -35,6 +32,9 @@ exports.createAgendamento = async (id_usuario, id_maquina, data_inicio, data_fim
     if (!usuario) throw new Error('Usuário não encontrado.');
     if (!maquina) throw new Error('Máquina não encontrada.');
 
+    if (maquina.status !== 'disponivel') {
+      throw new Error('Não é possível agendar em uma máquina que não está disponível.');
+    }
 
     const inicioTimestamp = new Date(data_inicio).getTime();
     const fimTimestamp = new Date(data_fim).getTime();
@@ -43,20 +43,19 @@ exports.createAgendamento = async (id_usuario, id_maquina, data_inicio, data_fim
       throw new Error('A data de término deve ser posterior à data de início.');
     }
 
-
     const agendamentosUsuario = await agendamentoModel.getAgendamentosByUserAndMachine(id_usuario, id_maquina, data_inicio);
     if (agendamentosUsuario.length > 0) {
       throw new Error('Você já possui um agendamento para esta máquina nesse período.');
     }
 
+    const count = await agendamentoModel.countAgendamentos(id_maquina, data_inicio);
+    if (count >= 2) {
+      throw new Error('Já existem dois usuários revezando esta máquina neste horário.');
+    }
 
-    const count = await agendamentoModel.countAgendamentos(id_maquina, data_inicio, data_fim);
-
-
-    const status = count >= 2 ? 'Pendente' : 'Disponível';
-
-    return await agendamentoModel.createAgendamento(id_usuario, id_maquina, data_inicio, data_fim, status);
+    return await agendamentoModel.createAgendamento(id_usuario, id_maquina, data_inicio, data_fim);
   } catch (error) {
+    console.error('Erro ao criar agendamento:', error.stack); // <-- log detalhado
     throw new Error(error.message || 'Erro ao criar agendamento.');
   }
 };

@@ -38,6 +38,7 @@ describe("Agendamento API", () => {
           data_fim: "2025-04-02T09:10:00Z"
         })
         .end((err, res) => {
+          console.log(res.body); // <-- Adicionado para ajudar no debug
           expect(res).to.have.status(201);
           expect(res.body).to.have.property("message");
           done();
