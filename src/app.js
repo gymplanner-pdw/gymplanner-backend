@@ -1,10 +1,12 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const { authenticateToken } = require('./middleware/authMiddleware');
 
 const { swaggerUi, swaggerSpecs } = require('./config/swaggerConfig');
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 
+app.use(cors());
 app.use(express.json());
 
 const userRoutes = require('./routes/userRoutes');
