@@ -36,7 +36,7 @@ npm install
 DB_HOST=localhost
 DB_PORT=5432
 DB_USER=postgres
-DB_PASSWORD=Kdchinel0
+DB_PASSWORD=[senha do seu postgresql localmente]
 DB_NAME=postgres
 ```
 
